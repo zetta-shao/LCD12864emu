@@ -425,16 +425,22 @@ char ssd1306_WriteChar(struct tSSD1306 *d, char ch, FontDef Font, SSD1306_COLOR 
     return ch;
 }
 
+// 1-31 => 95-125
+// 32-126 => 0-94
+// 127-255 => 126-254
 char ssd1306_WriteChar2(struct tSSD1306 *d, uint8_t ch, FontDef Font, SSD1306_COLOR color) {
     uint32_t i, j;
+    if(ch == 0) return 0;
     if (SSD1306_WIDTH < (d->CurrentX + Font.FontWidth) ||
         SSD1306_HEIGHT < (d->CurrentY + Font.FontHeight)) { return 0; }
     if(Font.FontHeight <= 8) {
         uint8_t *px, m;
         px = ((uint8_t*)Font.data);
-        if(ch < 32) px += (ch + 94) * Font.FontWidth; //font 1-31=>95-125
-        else if(ch < 127) px += (ch - 32) * Font.FontWidth; //font 32-126=>0-94
-        else px += (ch - 1) * Font.FontWidth; //127-255 => 126-254
+        if(Font.bBigTable == 0)
+            px += (ch - 32) * Font.FontWidth;
+        else
+            px += (ch - 1) * Font.FontWidth;
+
         for(i = 0; i < Font.FontWidth; i++) {
             for(m=0x80,j=0; j<Font.FontHeight; j++, m>>=1) {
                 ssd1306_DrawPixel(d, d->CurrentX + i, (d->CurrentY + j), (px[i] & m) ? color : !color);

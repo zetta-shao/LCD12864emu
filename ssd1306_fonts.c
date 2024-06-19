@@ -299,7 +299,7 @@ static const uint16_t Font16x26 [] = {
 0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x3F07,0x7FC7,0x73E7,0xF1FF,0xF07E,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000, // Ascii = [~]
 };
 #endif
-#ifdef SSD1306_INCLUDE_FONT_6x8
+#ifdef SSD1306_INCLUDE_FONT16_6x8
 static const uint16_t Font_6x8 [] = {
 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,  // sp
 0x2000, 0x2000, 0x2000, 0x2000, 0x2000, 0x0000, 0x2000, 0x0000,  // !
@@ -601,20 +601,20 @@ static const uint16_t Font16x24 [] = {
 };
 #endif
 
-#ifdef SSD1306_INCLUDE_FONT_6x8
-FontDef Font_6x8 = {6,8,Font_6x8};
+#ifdef SSD1306_INCLUDE_FONT16_6x8
+FontDef Font_6x8 = {6, 8, 0, 0, Font_6x8};
 #endif
 #ifdef SSD1306_INCLUDE_FONT_7x10
-FontDef Font_7x10 = {7,10,Font7x10};
+FontDef Font_7x10 = {7, 10, 0, 0, Font7x10};
 #endif
 #ifdef SSD1306_INCLUDE_FONT_11x18
-FontDef Font_11x18 = {11,18,Font11x18};
+FontDef Font_11x18 = {11, 18, 0, 0, Font11x18};
 #endif
 #ifdef SSD1306_INCLUDE_FONT_16x26
-FontDef Font_16x26 = {16,26,Font16x26};
+FontDef Font_16x26 = {16, 26, 0, 0, Font16x26};
 #endif
 
 /* see ./examples/custom-fonts/ */
 #ifdef SSD1306_INCLUDE_FONT_16x24
-FontDef Font_16x24 = {16,24,Font16x24};
+FontDef Font_16x24 = {16, 24, 0, 0, Font16x24};
 #endif

@@ -50,12 +50,11 @@ extern "C" {
 
 // Include only needed fonts
 //#define SSD1306_INCLUDE_FONT_5x7
-#define SSD1306_INCLUDE_FONT_5x8
+#define SSD1306_INCLUDE_FONT_6x8
 //#define SSD1306_INCLUDE_FONT16_6x8
-#define SSD1306_INCLUDE_FONT_7x10
+//#define SSD1306_INCLUDE_FONT_7x10
 //#define SSD1306_INCLUDE_FONT_11x18
 //#define SSD1306_INCLUDE_FONT_16x26
-
 //#define SSD1306_INCLUDE_FONT_16x24
 
 // The width of the screen can be set using this
