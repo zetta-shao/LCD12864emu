@@ -208,7 +208,7 @@ uint8_t ssd1306_GetDisplayOn();
 // Low-level procedures
 void ssd1306_Reset(struct tSSD1306 *d);
 void ssd1306_WriteCommand(struct tSSD1306 *d, uint8_t byte);
-void ssd1306_WriteData(struct tSSD1306 *d, uint8_t* buffer, size_t buff_size);
+void ssd1306_WriteData(struct tSSD1306 *d, uint8_t* buffer, uint8_t buff_size);
 SSD1306_Error_t ssd1306_FillBuffer(struct tSSD1306 *d, uint8_t* buf, uint32_t len);
 
 #ifdef __cplusplus

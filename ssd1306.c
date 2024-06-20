@@ -67,7 +67,7 @@ void ssd1306_WriteCommand(struct tSSD1306 *d, uint8_t byte) {
 }
 
 // Send data
-void ssd1306_WriteData(struct tSSD1306 *d, uint8_t* buffer, size_t buff_size) {
+void ssd1306_WriteData(struct tSSD1306 *d, uint8_t* buffer, uint8_t buff_size) {
     uint16_t tmp=256; uint8_t *pT=(uint8_t*)&tmp;
 #if 0
 	//uint8_t pT[2];

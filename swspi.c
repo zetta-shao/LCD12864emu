@@ -24,7 +24,7 @@ void swspi_HWinit(swspi_t *d, void *hWND) {
 	d->cpha = 0;
 	d->Delay_Time = 0;
 	d->bitmask = 0;
-	swspi_hal_init(d, (spi_gpio_t*)hWND, NULL, NULL);
+    swspi_hal_init(d, (spi_gpio_t*)hWND, 0, 0);
 }
 
 void swspi_setbits(swspi_t *d, uint8_t val) { if(val>0) d->bitmask = 1 << (val-1); else d->bitmask=0; }
