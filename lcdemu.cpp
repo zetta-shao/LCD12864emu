@@ -1,8 +1,9 @@
 #include "lcdemu.h"
+#include "lcd_fonts.h"
 
-uint16_t vout[8] = { 8302, 6541, 4999, 8998, 12153, 19254 };
-uint16_t iout[8] = {   15, 1490, 1951,  752,  1335, 1716 };
-uint16_t vin = 19757;
+int16_t vout[8] = { 8302, 6541, 4999, 8998, 12153, 19254 };
+int16_t iout[8] = {   -15, -1490, -1951,  -752,  -1335, -1716 };
+int16_t vin = 19757;
 
 uint8_t vbat_IP2365(uint16_t val) {
 #ifdef ICO_BATTERY_VOLTAGE
@@ -81,75 +82,6 @@ uint8_t out_icon(const char *label) {
 #endif
 }
 
-void str_3digit(uint16_t val, char *outstr) {
-#if defined (ICO_NUMBER_DOT) && defined(ICO_DOT_NUMBER)
-    if(val < 1000) {
-        sprintf(outstr, " %02d", val%100);
-        outstr[0] = ((val/100)%10) + ICO_DOT_NUMBER;
-    } else if(val < 10000) {
-        sprintf(outstr, " %02d", (val%1000)/10);
-        outstr[0] = ((val/1000)%10) + ICO_NUMBER_DOT;
-    } else if(val < 65535) {
-        sprintf(outstr, "%01d %01d", (val/10000)%10, (val%1000)/100);
-        outstr[1] = ((val/1000)%10) + ICO_NUMBER_DOT;
-    }
-    outstr[3] = 0;
-#else
-    (void)val; (void)outstr;
-#endif
-}
-
-void str_3digitL(uint16_t val, char *outstr) { //3+1
-    if(val < 1000) {
-        sprintf(outstr, ".%03d", val);
-    } else if(val < 10000) {
-        sprintf(outstr, "%01d.%02d", (val/1000)%10, (val%1000)/10);
-    } else if(val < 65535) {
-        sprintf(outstr, "%02d.%01d", (val/1000)%100, (val%1000)/100);
-    }
-    outstr[4] = 0;
-}
-
-void str_4digit(uint16_t val, char *outstr) {
-#ifdef ICO_NUMBER_DOT
-    if(val < 10000) {
-        sprintf(outstr, " %03d", val%1000);
-        outstr[0] = ((val/1000)%10) + ICO_NUMBER_DOT;
-    } else if(val < 65535) {
-        sprintf(outstr, "%01d %02d", (val/10000)%10, (val%1000)/10);
-        outstr[1] = ((val/1000)%10) + ICO_NUMBER_DOT;
-    }
-    outstr[4] = 0;
-#else
-    (void)val; (void)outstr;
-#endif
-}
-
-void str_4digitL(uint16_t val, char *outstr) { //4+1
-    if(val < 10000) {
-        sprintf(outstr, "%01d.%03d", (val/1000)%10, val%1000);
-    } else if(val < 65535) {
-        sprintf(outstr, "%02d.%02d", (val/1000)%100, (val%1000)/10);
-    }
-    outstr[5] = 0;
-}
-
-
-void str_5digit(uint16_t val, char *outstr) {
-#ifdef ICO_NUMBER_DOT
-    if(val < 10000)
-        sprintf(outstr, "  %03d", val%1000);
-    else
-        sprintf(outstr, "%01d %03d", (val/10000)%10, val%1000);
-
-    outstr[1] = ((val/1000)%10) + ICO_NUMBER_DOT;
-    outstr[5] = 0;
-#else
-    (void)val; (void)outstr;
-#endif
-}
-
-typedef void (*__strfmt)(uint16_t, char*);
 #define g_font Font_6x8
 
 LCDemu::LCDemu(QWidget *parent) : QWidget(parent) {
@@ -167,6 +99,7 @@ LCDemu::~LCDemu(void) {
 void LCDemu::setlcd(SSD1306_t *p) {
     if(!p) return;
     this->lcddev = p;
+    SSD1306_init(p, &p->d, &Font_6x8);
 }
 
 void LCDemu::update(void) {
@@ -216,21 +149,23 @@ void LCDemu::start(void) {
 }
 
 void LCDemu::task_key1(void) {
-    char str[64], lstr1[8], lstr2[8], lstr3[8];
-    FontDef _f = g_font;
+    char str[64];
+    char icons[][3] = { "b1", "b2", "c1", "c2", "c3", "c4" };
+    //char lstr1[8], lstr2[8], lstr3[8];
+    lcddev_t *d = &lcddev->d;
     __strfmt str_format = &str_3digitL;
     ssd1306_Fill(lcddev, Black);
-    ssd1306_SetCursor(lcddev, 0, 0); //6x6=36
-    ssd1306_WriteString(lcddev, (char*)"out vol  cur wat     ", _f, White);
-
-    {
-        //str_2dot3(vin, lstr1);
-        str_format(vin, lstr1);
-        sprintf(str, "%ci:%s            ", out_icon("pw"), lstr1);
-        ssd1306_SetCursor(lcddev, 0, SSD1306_HEIGHT-8); //6x6=36
-        ssd1306_WriteString(lcddev, str, _f, White);
+    if(1) {
+        fontdraw_setpos(d, 0, 0);
+        fontdraw_string(d, (char*)"ou vol cur  wat     ");
+        fontdraw_setpos(d, 0, SSD1306_HEIGHT-8);
+        sprintf(str, "%c:", out_icon("pw"));
+        fontdraw_string(d, str);
+        fontdraw_setpos(d, 12, SSD1306_HEIGHT-8);
+        str_format(vin, str);
+        fontdraw_string(d, str);
     }
-    {
+    if(1) {
         str[0] = vbat_IP2365(vout[0]);
         str[1] = vbat_IP2365(vout[1]);
         str[2] = vout_IP3518(vout[2]);
@@ -238,151 +173,132 @@ void LCDemu::task_key1(void) {
         str[4] = vout_IP3518(vout[4]);
         str[5] = vout_IP3518(vout[5]);
         str[6] = 0;
-        ssd1306_SetCursor(lcddev, SSD1306_WIDTH - 36, SSD1306_HEIGHT-8); //6x6=36
-        ssd1306_WriteString(lcddev, str, _f, White);
+        fontdraw_setpos(d, SSD1306_WIDTH - 36, SSD1306_HEIGHT-8);
+        fontdraw_string(d, str);
     }
+    if(1) {
+        uint32_t p, idx; int8_t np;
+        int yoft;
+        for(idx=0, yoft=8; idx<6; idx++, yoft+=8) {
+            p = (vout[idx] * iout[idx]) / 1000;
 
-    {
-        uint32_t p;
-        p = (vout[0] * iout[0]) / 1000;
-        str_format(vout[0], lstr1);
-        str_format(iout[0], lstr2);
-        str_format(p, lstr3);
-        //sprintf(str, "%c1:%s %s %s    ", 'b', lstr1, lstr2, lstr3);
-        sprintf(str, "%c:%s %s %s    ", out_icon("b1"), lstr1, lstr2, lstr3);
-        ssd1306_SetCursor(lcddev, 0, 8); //6x6=36
-        ssd1306_WriteString(lcddev, str, _f, White);
+            fontdraw_setpos(&lcddev->d, 0, yoft);
+            sprintf(str, "%c:", out_icon(icons[idx]));
+            fontdraw_stringC(&lcddev->d, str, 1);
 
-        p = (vout[1] * iout[1]) / 1000;
-        str_format(vout[1], lstr1);
-        str_format(iout[1], lstr2);
-        str_format(p, lstr3);
-        //sprintf(str, "%c2:%s %s %s    ",  'b', lstr1, lstr2, lstr3);
-        sprintf(str, "%c:%s %s %s    ",  out_icon("b2"), lstr1, lstr2, lstr3);
-        ssd1306_SetCursor(lcddev, 0, 16); //6x6=36
-        ssd1306_WriteString(lcddev, str, _f, White);
+            np = str_format(vout[idx], str);
+            fontdraw_setpos(&lcddev->d, 12, yoft);
+            fontdraw_stringC(&lcddev->d, str, np);
 
-        p = (vout[2] * iout[2]) / 1000;
-        str_format(vout[2], lstr1);
-        str_format(iout[2], lstr2);
-        str_format(p, lstr3);
-        //sprintf(str, "%c1:%s %s %s    ", 'A', lstr1, lstr2, lstr3);
-        sprintf(str, "%c:%s %s %s    ",  out_icon("a1"), lstr1, lstr2, lstr3);
-        if(vout[2] > 10000) str[3] = (vout[2]/10000) + '0';
-        ssd1306_SetCursor(lcddev, 0, 24); //6x6=36
-        ssd1306_WriteString(lcddev, str, _f, White);
+            np = str_format(iout[idx], str);
+            fontdraw_setpos(&lcddev->d, 42, yoft);
+            fontdraw_stringC(&lcddev->d, str, np);
 
-        p = (vout[3] * iout[3]) / 1000;
-        str_format(vout[3], lstr1);
-        str_format(iout[3], lstr2);
-        str_format(p, lstr3);
-        //sprintf(str, "%c2:%s %s %s    ", 'A', lstr1, lstr2, lstr3);
-        sprintf(str, "%c:%s %s %s    ",  out_icon("a2"), lstr1, lstr2, lstr3);
-        ssd1306_SetCursor(lcddev, 0, 32); //6x6=36
-        ssd1306_WriteString(lcddev, str, _f, White);
-
-        p = (vout[4] * iout[4]) / 1000;
-        str_format(vout[4], lstr1);
-        str_format(iout[4], lstr2);
-        str_format(p, lstr3);
-        //sprintf(str, "%c3:%s %s %s    ", 'c', lstr1, lstr2, lstr3);
-        sprintf(str, "%c:%s %s %s    ",  out_icon("c3"), lstr1, lstr2, lstr3);
-        ssd1306_SetCursor(lcddev, 0, 40); //6x6=36
-        ssd1306_WriteString(lcddev, str, _f, White);
-
-        p = (vout[5] * iout[5]) / 1000;
-        str_format(vout[5], lstr1);
-        str_format(iout[5], lstr2);
-        str_format(p, lstr3);
-        //sprintf(str, "%c4:%s %s %s    ", 'c', lstr1, lstr2, lstr3);
-        sprintf(str, "%c:%s %s %s    ",  out_icon("c4"), lstr1, lstr2, lstr3);
-        ssd1306_SetCursor(lcddev, 0, 48); //6x6=36
-        ssd1306_WriteString(lcddev, str, _f, White);
+            np = str_format(p, str);
+            fontdraw_setpos(&lcddev->d, 72, yoft);
+            fontdraw_stringC(&lcddev->d, str, np);
+        }
 
     }
+    if(0){
+        int x;
+        fontdraw_setpos(&lcddev->d, 0, 8);
+        for(x=0; x<16; x++) {
+            fontdraw_1bit(&lcddev->d, x, x, 1);
+            fontdraw_1bit(&lcddev->d, 15-x, x, 1);
+            fontdraw_1bit(&lcddev->d, 16+x, x, 1);
+            fontdraw_1bit(&lcddev->d, 31-x, x, 1);
+            fontdraw_1bit(&lcddev->d, x, x+16, 1);
+            fontdraw_1bit(&lcddev->d, 15-x, x+16, 1);
+            fontdraw_1bit(&lcddev->d, 16+x, x+16, 1);
+            fontdraw_1bit(&lcddev->d, 31-x, x+16, 1);
+        }
+    }
+
     update();
 }
 void LCDemu::task_key2(void) {
-    FontDef _f = g_font;
-    ssd1306_Fill(lcddev, Black);
-    ssd1306_SetCursor(lcddev, 0, 0);
-    ssd1306_WriteString(lcddev, (char*)"2keyevent", _f, White);
-    ssd1306_SetCursor(lcddev, 64, 0);
-    ssd1306_WriteString(lcddev, (char*)"2keyevent", _f, Black);
+    lcddev_t *d = &lcddev->d;
+    fontdraw_fill(d, 0);
+    fontdraw_setpos(d, 0, 0);
+    fontdraw_string(d, (char*)"2keyevent");
+    fontdraw_setpos(d, 64, 0);
+    fontdraw_stringC(d, (char*)"2keyevent", 1);
     update();
 
 }
 void LCDemu::task_key3(void) {
-    FontDef _f = g_font;
-    ssd1306_Fill(lcddev, Black);
-    ssd1306_SetCursor(lcddev, 0, 0);
-    ssd1306_WriteString(lcddev, (char*)"key_event", _f, White);
-    ssd1306_SetCursor(lcddev, 64, 0);
-    ssd1306_WriteString(lcddev, (char*)"key_event", _f, Black);
+    lcddev_t *d = &lcddev->d;
+    fontdraw_fill(d, 0);
+    fontdraw_setpos(d, 0, 0);
+    fontdraw_string(d, (char*)"keyevent");
+    fontdraw_setpos(d, 64, 0);
+    fontdraw_stringC(d, (char*)"keyevent", 1);
     update();
 
 }
 void LCDemu::task_key4(void) {
     char str[64];
-    FontDef _f = g_font;
-    ssd1306_Fill(lcddev, Black);
-    ssd1306_SetCursor(lcddev, 0, 0);
-    ssd1306_WriteString(lcddev, (char*)"ABCDEFGHI", _f, White);
-    ssd1306_SetCursor(lcddev, 0, 8);
-    ssd1306_WriteString(lcddev, (char*)"JKLMNOPQR", _f, White);
-    ssd1306_SetCursor(lcddev, 0, 16);
-    ssd1306_WriteString(lcddev, (char*)"STUVWXYZ!", _f, White);
-    ssd1306_SetCursor(lcddev, 64, 0);
-    ssd1306_WriteString(lcddev, (char*)"abcdefghi", _f, Black);
-    ssd1306_SetCursor(lcddev, 64, 8);
-    ssd1306_WriteString(lcddev, (char*)"jklmnopqr", _f, Black);
-    ssd1306_SetCursor(lcddev, 64, 16);
-    ssd1306_WriteString(lcddev, (char*)"stuvwxyz!", _f, Black);
+    lcddev_t *d = &lcddev->d;
+    fontdraw_fill(d, 0);
+    fontdraw_setpos(d, 0, 0);
+    fontdraw_string(d, (char*)"ABCDEFGHI");
+    fontdraw_setpos(d, 0, 8);
+    fontdraw_string(d, (char*)"JKLMNOPQR");
+    fontdraw_setpos(d, 0, 16);
+    fontdraw_string(d, (char*)"STUVWXYZ!");
+    fontdraw_setpos(d, 64, 0);
+    fontdraw_stringC(d, (char*)"abcdefghi", 0);
+    fontdraw_setpos(d, 64, 8);
+    fontdraw_stringC(d, (char*)"jklmnopqr", 0);
+    fontdraw_setpos(d, 64, 16);
+    fontdraw_stringC(d, (char*)"stuvwxyz!", 0);
 
     {
         int i, v=1;
         for(i=0; i<10; i++, v++) str[i] = v;
         str[i] = 0;
-        ssd1306_SetCursor(lcddev, 0, 24);
-        ssd1306_WriteString(lcddev, str, _f, White);
+
+        fontdraw_setpos(d, 0, 24);
+        fontdraw_string(d, str);
         for(i=0; i<10; i++, v++) str[i] = v;
         str[i] = 0;
-        ssd1306_SetCursor(lcddev, 64, 24);
-        ssd1306_WriteString(lcddev, str, _f, White);
+        fontdraw_setpos(d, 64, 24);
+        fontdraw_string(d, str);
 
         for(i=0; i<10; i++, v++) str[i] = v;
         str[i] = 0;
-        ssd1306_SetCursor(lcddev, 0, 32);
-        ssd1306_WriteString(lcddev, str, _f, White);
+        fontdraw_setpos(d, 0, 32);
+        fontdraw_string(d, str);
 
         for(i=0; i<10; i++, v++) str[i] = v;
         str[i] = 0;
-        ssd1306_SetCursor(lcddev, 64, 32);
-        ssd1306_WriteString(lcddev, str, _f, White);
+        fontdraw_setpos(d, 64, 32);
+        fontdraw_string(d, str);
 
         v = 118;
         for(i=0; i<10; i++, v++) str[i] = v;
         str[i] = 0;
-        ssd1306_SetCursor(lcddev, 0, 40);
-        ssd1306_WriteString(lcddev, str, _f, White);
+        fontdraw_setpos(d, 0, 40);
+        fontdraw_string(d, str);
 
         v = 128;
         for(i=0; i<10; i++, v++) str[i] = v;
         str[i] = 0;
-        ssd1306_SetCursor(lcddev, 64, 40);
-        ssd1306_WriteString(lcddev, str, _f, White);
+        fontdraw_setpos(d, 64, 40);
+        fontdraw_string(d, str);
 
         v = 138;
         for(i=0; i<10; i++, v++) str[i] = v;
         str[i] = 0;
-        ssd1306_SetCursor(lcddev, 0, 48);
-        ssd1306_WriteString(lcddev, str, _f, White);
+        fontdraw_setpos(d, 0, 48);
+        fontdraw_string(d, str);
 
         v = 148;
         for(i=0; i<2; i++, v++) str[i] = v;
         str[i] = 0;
-        ssd1306_SetCursor(lcddev, 64, 48);
-        ssd1306_WriteString(lcddev, str, _f, White);
+        fontdraw_setpos(d, 64, 48);
+        fontdraw_string(d, str);
 
     }
     update();

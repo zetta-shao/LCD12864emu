@@ -6,8 +6,8 @@
 #include "ssd1306.h"
 #include "lcdemu.h"
 
-swspi_t sspi1 = { 0 };
-SSD1306_t ssd13061 = { 0 };
+swspi_t sspi1;
+SSD1306_t ssd13061;
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);

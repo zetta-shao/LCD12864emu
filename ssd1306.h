@@ -56,7 +56,7 @@ extern "C" {
 
 #define SPI_3PIN 1
 
-#include "ssd1306_fonts.h"
+//#include "ssd1306_fonts.h"
 
 /* vvv I2C config vvv */
 
@@ -99,6 +99,8 @@ extern SPI_HandleTypeDef SSD1306_SPI_PORT;
 //typedef stm32_gpio_t ssd1306_gpio_t; //change for other MCU
 typedef amd64_gpio_t ssd1306_gpio_t; //change for other MCU
 
+#include "lcd_fonts.h"
+
 // Enumeration for screen colors
 typedef enum {
     Black = 0x00, // Black color, no pixel
@@ -112,8 +114,9 @@ typedef enum {
 
 // Struct to store transformations
 typedef struct tSSD1306 {
-	uint16_t 	CurrentX;
-	uint16_t 	CurrentY;
+    //uint16_t 	CurrentX;
+    //uint16_t 	CurrentY;
+    lcddev_t    d;
 	uint8_t 	flag;
 	uint8_t		i2c_addr;
 	ssd1306_gpio_t	DC;
@@ -165,7 +168,8 @@ void SSD1306_gpioinit5W2(struct tSSD1306 *d, ssd1306_gpio_t *CS, ssd1306_gpio_t 
 void SSD1306_gpioinit4W2(struct tSSD1306 *d, ssd1306_gpio_t *CS, ssd1306_gpio_t *DC);
 //void SSD1306_gpioinit3W(struct tSSD1306 *d, void* CSport, uint16_t CSpin);
 void SSD1306_gpioinit3W2(struct tSSD1306 *d, ssd1306_gpio_t *CS);
-void SSD1306_Init(struct tSSD1306 *d, void *pvport);
+//void SSD1306_Init(struct tSSD1306 *d, void *pvport);
+void SSD1306_init(struct tSSD1306 *d, void *pvport, void* pvFontDef);
 void SH1106_Init(struct tSSD1306 *d, void *pvport);
 void ssd1306_Fill(struct tSSD1306 *d, SSD1306_COLOR color);
 void ssd1306_UpdateScreen(struct tSSD1306 *d);

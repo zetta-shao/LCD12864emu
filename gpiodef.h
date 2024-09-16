@@ -80,10 +80,10 @@ void Error_Handler(void);
 void GPIOinit(void);
 void SI2cInit_stm32(void *pvswI2Ct, void* dwSDAport, void* swSCLport, uint8_t bSDApin, uint8_t bSCLpin);
 
-typedef struct t_amd64_gpio {
-	void	*port;
-	uint16_t pin;
-} amd64_gpio_t;
+//typedef struct t_amd64_gpio {
+//	void	*port;
+//	uint16_t pin;
+//} amd64_gpio_t;
 
 #ifdef STM32
 #define STM32_SYSTICK_LOAD (SystemCoreClock/1000000U)

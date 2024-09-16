@@ -31,9 +31,9 @@ int swspi_hal_transmit_receive(void *hWND, uint8_t *pRead, uint8_t *pWrite, uint
     (void)hWND; (void)pRead; (void)pWrite; (void)datasize; return 0;
 }
 
-void swspi_hal_init(swspi_t *d, spi_gpio_t *clk, spi_gpio_t *mosi, spi_gpio_t *miso) {
+int swspi_hal_init(swspi_t *d, spi_gpio_t *clk, spi_gpio_t *mosi, spi_gpio_t *miso) {
     //d->hal_io_ctl = swspi_port_io_ctl;
-    if(d->bitmask == 0) { // h/w spi
+    if(d->Delay_Time == 0) { // h/w spi
     	d->CLK.port = (void*)clk; d->CLK.pin = 65535;
     } else { // s/w spi
     	if(clk) {
@@ -49,4 +49,10 @@ void swspi_hal_init(swspi_t *d, spi_gpio_t *clk, spi_gpio_t *mosi, spi_gpio_t *m
     		swspi_hal_gpio_mode(&d->MISO, 0);
     	}
     }
+    return 0;
 }
+
+int swspi_hal_setmode(swspi_t *d, uint8_t val) { (void)d; (void)val; return 0; }
+int swspi_hal_setspeed(swspi_t *d, uint32_t val) { (void)d; (void)val; return 0; }
+void swspi_hal_spiclose(swspi_t *d) { (void)d; return; }
+int swspi_hal_setbits(swspi_t *d, uint8_t val) { (void)d; (void)val; return 0; }
