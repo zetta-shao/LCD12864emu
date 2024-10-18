@@ -11,7 +11,7 @@
 // sw_spi 初始化
 //void swspi_initial(swspi_t *d) { if (!d) return; d->hal_init(d); }
 
-int swspi_SWinit(swspi_t *d, spi_gpio_t *clk, spi_gpio_t *mosi, spi_gpio_t *miso) {
+int swspi_SWinit(swspi_t *d, swgpio_t *clk, swgpio_t *mosi, swgpio_t *miso) {
     d->cpol = 0;
     d->cpha = 0;
     d->Delay_Time = SWSPI_DELAY;
@@ -24,7 +24,7 @@ int swspi_HWinit(swspi_t *d, void *hWND) {
     d->cpha = 0;
     d->Delay_Time = 0;
     d->bitmask = 0;
-    return swspi_hal_init(d, (spi_gpio_t*)hWND, 0, 0);
+    return swspi_hal_init(d, (swgpio_t*)hWND, 0, 0);
 }
 
 int swspi_setbits(swspi_t *d, uint8_t val) { 
@@ -156,17 +156,17 @@ void swspi_write(swspi_t *d, uint8_t *pWrite, uint32_t len) {
     }
 }
 
-void swspi_setgpo(spi_gpio_t *gpiogrp, uint8_t val) {
+void swspi_setgpo(swgpio_t *gpiogrp, uint8_t val) {
     if(!gpiogrp->port || gpiogrp->pin==65535) return;
     swspi_hal_gpio_out(gpiogrp, val);
 }
 
-uint8_t swspi_getgpi(spi_gpio_t *gpiogrp) {
+uint8_t swspi_getgpi(swgpio_t *gpiogrp) {
     if(!gpiogrp->port || gpiogrp->pin==65535) return 0;
     return swspi_hal_gpio_in(gpiogrp);
 }
 
-void swspi_setgpmode(spi_gpio_t *gpiogrp, uint8_t val) { swspi_hal_gpio_mode(gpiogrp, val); }
+void swspi_setgpmode(swgpio_t *gpiogrp, uint8_t val) { swspi_hal_gpio_mode(gpiogrp, val); }
 int swspi_setmode(swspi_t *d, uint8_t val) { return swspi_hal_setmode(d, val); }
 int swspi_setspeed(swspi_t *d, uint32_t val) { return swspi_hal_setspeed(d, val); }
 void swspi_spifree(swspi_t *d) { swspi_hal_spiclose(d); }

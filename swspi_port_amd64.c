@@ -6,13 +6,13 @@ void swspi_hal_delay_us(uint32_t us) { (void)us; }
 void swspi_hal_delay_ms(uint32_t ms) { (void)ms; }
 void HAL_Delay(uint32_t mS) { swspi_hal_delay_ms(mS); }
 
-void swspi_hal_gpio_out(spi_gpio_t *d, uint8_t val) {
+void swspi_hal_gpio_out(swgpio_t *d, uint8_t val) {
     (void)d; (void)val;
 }
-uint8_t swspi_hal_gpio_in(spi_gpio_t *d) {
+uint8_t swspi_hal_gpio_in(swgpio_t *d) {
     (void)d; return 0;
 }
-void swspi_hal_gpio_mode(spi_gpio_t *d, uint8_t val) {
+void swspi_hal_gpio_mode(swgpio_t *d, uint8_t val) {
     (void)d; (void)val;
 }
 
@@ -31,7 +31,7 @@ int swspi_hal_transmit_receive(void *hWND, uint8_t *pRead, uint8_t *pWrite, uint
     (void)hWND; (void)pRead; (void)pWrite; (void)datasize; return 0;
 }
 
-int swspi_hal_init(swspi_t *d, spi_gpio_t *clk, spi_gpio_t *mosi, spi_gpio_t *miso) {
+int swspi_hal_init(swspi_t *d, swgpio_t *clk, swgpio_t *mosi, swgpio_t *miso) {
     //d->hal_io_ctl = swspi_port_io_ctl;
     if(d->Delay_Time == 0) { // h/w spi
     	d->CLK.port = (void*)clk; d->CLK.pin = 65535;

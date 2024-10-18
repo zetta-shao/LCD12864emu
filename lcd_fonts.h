@@ -8,19 +8,19 @@ extern "C" {
 #include "lcd_font_def.h"
 #include "lcd_fontdraw.h"
 
-#define FONT_FLAG_WPTR	0x01
-#define FONT_FLAG_VERT	0x02
-#define FONT_FLAG_BTAB	0x04
+#define FONT_FLAG_WPTR    0x01
+#define FONT_FLAG_VERT    0x02
+#define FONT_FLAG_BTAB    0x04
 
 typedef struct FontDef FontDef;
 
 struct FontDef {
-	const uint8_t FontWidth;    /*!< Font width in pixels */
-	const uint8_t FontHeight;   /*!< Font height in pixels */
+    const uint8_t FontWidth;    /*!< Font width in pixels */
+    const uint8_t FontHeight;   /*!< Font height in pixels */
     //const uint8_t bBigTable; //0 mean code table from 32-127, 1 mean code table 1-255
-	const uint8_t flags;
+    const uint8_t flags;
     const uint8_t unused1;
-	const uint16_t *data; /*!< Pointer to data font data array */
+    const uint16_t *data; /*!< Pointer to data font data array */
 };
 
 //typedef struct {
@@ -40,6 +40,9 @@ extern FontDef Font_7x10;
 #endif
 #ifdef LCDFONT_INCLUDE_FONT_8x16
 extern FontDef Font_8x16;
+#endif
+#ifdef LCDFONT_INCLUDE_FONT_6x8_16
+extern FontDef Font_6x8_16;
 #endif
 #ifdef LCDFONT_INCLUDE_FONT_11x18
 extern FontDef Font_11x18;

@@ -7,7 +7,7 @@
 #include "lcdemu.h"
 
 swspi_t sspi1;
-SSD1306_t ssd13061;
+//SSD1306_t ssd13061;
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
@@ -15,10 +15,12 @@ int main(int argc, char *argv[]) {
     int32_t wz_width=SSD1306_WIDTH*SCALE_W_;
     int32_t wz_height=SSD1306_HEIGHT*SCALE_H_;
     LCDemu lcd(w.centralWidget());
-    lcd.setlcd(&ssd13061);
+    //lcd.setlcd(&ssd13061);
+    wz_width = lcd.m_pSSD1306->d.frameWidth * SCALE_W_;
+    wz_height = lcd.m_pSSD1306->d.frameHeight * SCALE_H_;
     w.resize(wz_width, wz_height+24);
     lcd.setGeometry(0, 0, wz_width, wz_height);
-    swspi_HWinit(&sspi1, w.centralWidget());
+    //swspi_HWinit(&sspi1, w.centralWidget());
     w.show();
     lcd.setFocusPolicy(Qt::StrongFocus);
     lcd.start();
