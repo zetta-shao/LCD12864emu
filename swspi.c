@@ -29,8 +29,7 @@ int swspi_HWinit(swspi_t *d, void *hWND) {
 
 int swspi_setbits(swspi_t *d, uint8_t val) { 
     if(d->Delay_Time == 0) return swspi_hal_setbits(d, val);
-    else {
-        if(val>0) d->bitmask = 1 << (val-1); else d->bitmask=0; return 0; }
+    if(val>0) d->bitmask = 1 << (val-1); else d->bitmask=0; return 0; }
 }
 
 //void swspi_setCLK(swspi_t *d) { d->hal_io_ctl(IOCTL_SWSPI_SET_GPIO_HIGH, &d->CLK); }

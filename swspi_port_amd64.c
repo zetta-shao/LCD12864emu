@@ -16,19 +16,19 @@ void swspi_hal_gpio_mode(swgpio_t *d, uint8_t val) {
     (void)d; (void)val;
 }
 
-int swspi_hal_transmit(void *hWND, uint8_t *pWrite, uint16_t datasize) {
+int swspi_hal_transmit(swgpio_t *d, uint8_t *pWrite, uint16_t datasize) {
 	//return HAL_SPI_Transmit(hWND, pWrite, datasize, HAL_MAX_DELAY);
-    (void)hWND; (void)pWrite; (void)datasize; return 0;
+    (void)d; (void)pWrite; (void)datasize; return 0;
 }
 
-int swspi_hal_receive(void *hWND, uint8_t *pRead, uint16_t datasize) {
+int swspi_hal_receive(swgpio_t *d, uint8_t *pRead, uint16_t datasize) {
 	//return HAL_SPI_Receive(hWND, pRead, datasize, HAL_MAX_DELAY);
-    (void)hWND; (void)pRead; (void)datasize; return 0;
+    (void)d; (void)pRead; (void)datasize; return 0;
 }
 
-int swspi_hal_transmit_receive(void *hWND, uint8_t *pRead, uint8_t *pWrite, uint16_t datasize) {
+int swspi_hal_transmit_receive(swgpio_t *d, uint8_t *pRead, uint8_t *pWrite, uint16_t datasize) {
 	//return HAL_SPI_TransmitReceive(hWND, pWrite, pRead, datasize, HAL_MAX_DELAY);
-    (void)hWND; (void)pRead; (void)pWrite; (void)datasize; return 0;
+    (void)d; (void)pRead; (void)pWrite; (void)datasize; return 0;
 }
 
 int swspi_hal_init(swspi_t *d, swgpio_t *clk, swgpio_t *mosi, swgpio_t *miso) {

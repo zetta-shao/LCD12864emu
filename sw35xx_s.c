@@ -58,7 +58,7 @@ int __sw35xx_i2cReadReg8(struct t_sw35xx *d, const uint8_t reg) {
 	for(; i > 0; i--) {
         if(swi2c_Read_8addr(d->pDev, SW35XX_ADDRESS, reg, &val, 1) == 0) break;
 	}
-	return (i == 0) ? 2 : 0;
+    return val;
 }
 
 int __sw35xx_i2cWriteReg8(struct t_sw35xx *d, const uint8_t reg, const uint8_t data) {
@@ -75,12 +75,15 @@ int __sw35xx_i2cWriteReg8(struct t_sw35xx *d, const uint8_t reg, const uint8_t d
 	for(; i > 0; i--) {
 		if(swi2c_Write_8addr(d->pDev, SW35XX_ADDRESS, reg, (uint8_t*)&data, 1) == 0) break;
 	}
-	return (i == 0) ? 2 : 0;
+    return (i == 0) ? -1 : 0;
 }
 
 void SW35xx_begin(struct t_sw35xx *d){
   //启用输入电压读取
+    if(! d->pDev) return;
+    SW35xx_unlock_i2c_write(d);
     __sw35xx_i2cWriteReg8(d, SW35XX_I2C_CTRL, 0x02);
+    SW35xx_lock_i2c_write(d);
 }
 
 uint16_t __sw35xx_readADCDataBuffer(struct t_sw35xx *d, const uint8_t type) {
@@ -98,7 +101,7 @@ void SW35xx_readStatus(struct t_sw35xx *d, uint8_t useADCDataBuffer) {
   uint16_t iout_usba = 0;
 
   SW35xx_unlock_i2c_write(d);
-  __sw35xx_i2cWriteReg8(d, SW35XX_I2C_CTRL, 0x02);
+  //__sw35xx_i2cWriteReg8(d, SW35XX_I2C_CTRL, 0x02);
   if(useADCDataBuffer != 0) {
     //读取输入电压
     vin = __sw35xx_readADCDataBuffer(d, ADC_VIN);

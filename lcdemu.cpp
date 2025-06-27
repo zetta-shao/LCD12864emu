@@ -1,6 +1,6 @@
 #include "lcdemu.h"
 
-int16_t vout[8] = { 8302, 6541, 4999, 8998, 12153, 19254 };
+int16_t vout[8] = { 8302, 6541, 999, 8998, 12153, 19254 };
 int16_t iout[8] = {   -15, -1490, -1951,  -752,  -1335, -1716 };
 int16_t vin = 19757;
 
@@ -177,7 +177,7 @@ void LCDemu::TimeEvent(void) {
     iout[0] = ina3221_getCur_mA(m_pINA3221, 0);
     vout[1] = ina3221_getVol_mV(m_pINA3221, 1);
     iout[1] = ina3221_getCur_mA(m_pINA3221, 1);
-    SW35xx_readStatus(m_pSW3518[0], 1);
+    SW35xx_readStatus(m_pSW3518[0], 0);
     vout[2] = m_pSW3518[0]->vout_mV;
     if(m_pSW3518[0]->iout_usba_mA != 0)
         iout[2] = m_pSW3518[0]->iout_usba_mA;
@@ -217,6 +217,10 @@ void LCDemu::start(void) {
         if(m_pIP2365[i]->pD == nullptr) continue;
         ip2365_enable(m_pIP2365[i], 1);
     }
+    SW35xx_begin(m_pSW3518[0]);
+    SW35xx_begin(m_pSW3518[1]);
+    SW35xx_begin(m_pSW3518[2]);
+    SW35xx_begin(m_pSW3518[3]);
 }
 
 void LCDemu::task_key1(void) {
